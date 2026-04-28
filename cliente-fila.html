@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Barbearia Camisa 12 Sports - Entre na Fila</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #e8f4f8 0%, #d4eaf0 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 550px; margin: 0 auto; }
+        .header { background: linear-gradient(135deg, #1a1a2e, #16213e); border-radius: 30px; padding: 25px; text-align: center; margin-bottom: 20px; color: white; }
+        .logo-3d { display: flex; justify-content: center; margin-bottom: 15px; perspective: 1000px; }
+        .logo-card { background: linear-gradient(145deg, #2a2a3e, #1a1a2e); width: 120px; height: 120px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 20px 30px rgba(0,0,0,0.4); transform-style: preserve-3d; animation: rotate3d 4s ease-in-out infinite; border: 2px solid #e6b422; }
+        @keyframes rotate3d { 0% { transform: rotateY(0deg); } 50% { transform: rotateY(10deg); } 100% { transform: rotateY(0deg); } }
+        .logo-emoji { font-size: 4.5rem; }
+        .logo-text { margin-top: 10px; font-size: 0.8rem; letter-spacing: 3px; color: #e6b422; text-transform: uppercase; font-weight: bold; }
+        .header h1 { color: white; font-size: 1.3rem; }
+        .header p { color: #ccc; font-size: 0.7rem; }
+        
+        /* STATUS DA FILA */
+        .fila-status {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-radius: 20px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: white;
+        }
+        .fila-status h3 { color: #e6b422; margin-bottom: 10px; }
+        .fila-atual {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #e6b422;
+            background: rgba(255,255,255,0.1);
+            display: inline-block;
+            padding: 10px 30px;
+            border-radius: 50px;
+            margin: 10px 0;
+        }
+        .total-espera { font-size: 0.9rem; color: #ccc; }
+        
+        .app-banner { background: linear-gradient(135deg, #2d2d44, #1a1a2e); border-radius: 25px; padding: 20px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px; border: 1px solid #e6b422; }
+        .app-info { flex: 2; min-width: 180px; }
+        .app-info h3 { color: #e6b422; font-size: 1rem; }
+        .app-info p { color: #ccc; font-size: 0.7rem; }
+        .qr-code-app { text-align: center; background: white; padding: 12px; border-radius: 20px; cursor: pointer; min-width: 110px; }
+        .qr-code-app canvas { width: 80px !important; height: 80px !important; }
+        .qr-code-app small { font-size: 0.65rem; color: #555; display: block; }
+        .qr-code-app strong { color: #e6b422; font-size: 0.7rem; }
+        .qr-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; }
+        .qr-modal-content { background: white; border-radius: 30px; padding: 25px; text-align: center; max-width: 85%; }
+        .qr-modal-content canvas { width: 250px !important; height: 250px !important; margin: 15px 0; }
+        .modal-close { background: #e6b422; border: none; padding: 10px 20px; border-radius: 25px; margin-top: 10px; cursor: pointer; }
+        
+        .service-select { margin-bottom: 15px; }
+        .service-select label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
+        .dropdown-select { width: 100%; padding: 14px; background: white; border: 2px solid #e0e0e0; border-radius: 20px; font-size: 1rem; cursor: pointer; appearance: none; background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23e6b422" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>'); background-repeat: no-repeat; background-position: right 15px center; }
+        .service-price-display { background: #f8f9fa; padding: 10px; border-radius: 15px; margin-top: 10px; text-align: center; font-weight: bold; color: #e6b422; }
+        
+        .form-card { background: white; border-radius: 25px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        label { display: block; margin-top: 12px; margin-bottom: 5px; font-weight: 600; color: #333; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 15px; font-size: 1rem; }
+        
+        /* SENHA */
+        .senha-container {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            border-radius: 20px;
+            padding: 15px;
+            margin: 10px 0;
+            text-align: center;
+            cursor: pointer;
+        }
+        .senha-title { color: white; font-weight: bold; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .senha-number { font-size: 2rem; font-weight: bold; color: white; letter-spacing: 2px; background: rgba(0,0,0,0.2); display: inline-block; padding: 8px 25px; border-radius: 50px; margin: 10px 0; }
+        .senha-position { font-size: 0.9rem; color: white; margin-top: 5px; }
+        .senha-timer { background: rgba(0,0,0,0.1); border-radius: 15px; padding: 8px; margin-top: 8px; font-size: 0.8rem; color: white; }
+        .senha-btn { background: white; color: #28a745; border: none; padding: 8px 16px; border-radius: 25px; margin-top: 8px; cursor: pointer; font-weight: bold; }
+        
+        .pix-container { background: linear-gradient(135deg, #6c2bd4, #8b5cf6); border-radius: 20px; padding: 20px; margin: 10px 0; text-align: center; }
+        .pix-key-box { background: white; border-radius: 15px; padding: 15px; margin: 10px 0; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .pix-key-value { font-size: 1rem; font-weight: bold; color: #333; word-break: break-all; flex: 1; }
+        .btn-copy-pix { background: #6c2bd4; color: white; border: none; padding: 10px 20px; border-radius: 25px; cursor: pointer; font-weight: bold; }
+        .pix-value { background: rgba(255,255,255,0.2); border-radius: 12px; padding: 10px; margin-top: 10px; color: white; font-weight: bold; font-size: 1.1rem; }
+        
+        .payment-options { display: flex; gap: 12px; margin-top: 5px; flex-wrap: wrap; }
+        .payment-card { flex: 1; background: #f8f9fa; border: 2px solid #e0e0e0; border-radius: 15px; padding: 12px; text-align: center; cursor: pointer; }
+        .payment-card.selected { border-color: #e6b422; background: #fff8e7; }
+        .payment-icon { font-size: 1.5rem; }
+        .total-area { background: #f8f9fa; border-radius: 15px; padding: 12px; text-align: center; margin: 15px 0; }
+        .total-value { font-size: 1.8rem; font-weight: bold; color: #e6b422; }
+        .btn-agendar { background: #e6b422; width: 100%; padding: 15px; border: none; border-radius: 30px; font-size: 1rem; font-weight: bold; cursor: pointer; margin-top: 15px; }
+        footer { text-align: center; padding: 20px; color: #888; font-size: 0.7rem; }
+        
+        .senha-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 3000; justify-content: center; align-items: center; }
+        .senha-modal-content { background: linear-gradient(135deg, #28a745, #20c997); border-radius: 40px; padding: 30px; text-align: center; max-width: 85%; border: 2px solid white; }
+        .senha-modal-content h2 { color: white; margin-bottom: 15px; }
+        .senha-modal-big { font-size: 4rem; font-weight: bold; color: #28a745; background: white; padding: 20px; border-radius: 20px; margin: 15px 0; }
+        .senha-modal-content p { color: white; }
+        @media (max-width: 480px) { .app-banner { flex-direction: column; text-align: center; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <div class="logo-3d"><div class="logo-card"><div class="logo-emoji">🧔🏼‍♂️</div></div></div>
+        <div class="logo-text">BARBEARIA</div>
+        <h1>Camisa 12 Sports</h1>
+        <p>Corte, barba e estilo para o verdadeiro camisa 12</p>
+    </div>
+
+    <!-- STATUS DA FILA EM TEMPO REAL -->
+    <div class="fila-status">
+        <h3>🎫 FILA DE ATENDIMENTO</h3>
+        <div>Estamos atendendo agora:</div>
+        <div class="fila-atual" id="senhaAtualDisplay">---</div>
+        <div class="total-espera" id="pessoasNaFrente">Pessoas na sua frente: --</div>
+        <div class="total-espera" id="tempoEsperaDisplay" style="margin-top:5px;"></div>
+    </div>
+
+    <div class="app-banner">
+        <div class="app-info"><h3>📱 BAIXE NOSSO APP</h3><p>Agende seus horários direto do seu celular</p></div>
+        <div class="qr-code-app" id="qrCodeAppBtn"><div id="qrCodeAppContainer"></div><strong>📲 APP</strong><small>Clique para ampliar</small></div>
+    </div>
+
+    <div class="service-select">
+        <label>✂️ Selecione o serviço:</label>
+        <select id="servicoSelect" class="dropdown-select">
+            <option value="corte">✂️ Corte Masculino - R$ 40</option>
+            <option value="barba">🧔 Barba Premium - R$ 35</option>
+        </select>
+        <div class="service-price-display" id="servicoPriceDisplay">💰 Valor: R$ 40,00</div>
+    </div>
+
+    <div class="combo-card" id="comboCard" style="background: linear-gradient(135deg, #fff8e7, #fff4dc); border: 2px solid #e6b422; border-radius: 20px; padding: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; margin-bottom: 15px;">
+        <div><strong>🏆 COMBO CAMISA 12</strong><div style="font-size:0.7rem; color:#888;">✂️ Corte + 🧔 Barba + 💈 Acabamento</div></div>
+        <div class="service-price" id="precoCombo">R$ 70</div>
+    </div>
+
+    <div class="form-card">
+        <div class="total-area"><span>💰 VALOR TOTAL</span><div class="total-value" id="totalValor">R$ 40,00</div></div>
+
+        <label>👤 Seu nome</label>
+        <input type="text" id="nome" placeholder="Digite seu nome completo">
+
+        <label>📞 Seu WhatsApp (com DDD)</label>
+        <input type="tel" id="whats" placeholder="Ex: 5521989533627">
+        <small style="color:#888;">Você será avisado quando chegar sua vez</small>
+
+        <label>💳 Forma de Pagamento</label>
+        <div class="payment-options" id="paymentOptions">
+            <div class="payment-card" data-pagamento="pix"><div class="payment-icon">💳</div><div class="payment-name">PIX</div></div>
+            <div class="payment-card" data-pagamento="dinheiro"><div class="payment-icon">💰</div><div class="payment-name">Dinheiro</div></div>
+            <div class="payment-card" data-pagamento="cartao"><div class="payment-icon">💳</div><div class="payment-name">Cartão</div></div>
+        </div>
+
+        <!-- PIX -->
+        <div class="pix-container">
+            <div class="pix-key-box">
+                <span class="pix-key-value" id="pixKeyDisplay">10189438703</span>
+                <button class="btn-copy-pix" id="copyPixBtn">📋 Copiar</button>
+            </div>
+            <div class="pix-value" id="pixValorDisplay">💰 Valor: R$ 40,00</div>
+            <small>Copie a chave e cole no seu banco</small>
+        </div>
+
+        <!-- SENHA DA FILA -->
+        <div class="senha-container" id="senhaContainer">
+            <div class="senha-title">🎫 SUA POSIÇÃO NA FILA</div>
+            <div class="senha-number" id="senhaDisplay">---</div>
+            <div class="senha-position" id="posicaoDisplay"></div>
+            <div class="senha-timer" id="timerDisplay"></div>
+            <button class="senha-btn" id="entrarFilaBtn">🎫 ENTRAR NA FILA</button>
+        </div>
+
+        <button class="btn-agendar" id="btnConfirmarFila">📌 CONFIRMAR E ENTRAR NA FILA</button>
+    </div>
+    <footer>Barbearia Camisa 12 Sports • Fila de Atendimento</footer>
+</div>
+
+<div id="senhaModal" class="senha-modal">
+    <div class="senha-modal-content">
+        <h2>🎫 VOCÊ ESTÁ NA FILA!</h2>
+        <div class="senha-modal-big" id="senhaModalDisplay">---</div>
+        <p id="modalPosicaoDisplay"></p>
+        <p id="modalTimerDisplay"></p>
+        <p id="modalSenhaAtualDisplay"></p>
+        <button class="modal-close" id="closeSenhaModal">Fechar</button>
+    </div>
+</div>
+
+<div id="qrAppModal" class="qr-modal"><div class="qr-modal-content"><h3>📱 BAIXE NOSSO APP</h3><p>Escaneie o QR Code</p><div id="qrAppModalContainer"></div><button class="modal-close" id="closeQrAppModal">Fechar</button></div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script>
+    // ========== CONFIGURAÇÕES ==========
+    const CHAVE_PIX = "10189438703";
+    const DONO_WHATSAPP = "5521989533627";
+    const LINK_APP = "https://guilherme8424.github.io/AppBarbearia12/";
+    
+    let ultimaSenha = parseInt(localStorage.getItem('ultimaSenha') || '0');
+    let senhaAtualAtendimento = parseInt(localStorage.getItem('senhaAtualAtendimento') || '0');
+    let tempoMedio = parseInt(localStorage.getItem('tempoAtendimento') || '10');
+    
+    let meuCliente = null;
+    // ===================================
+
+    let precos = { corte: 40, barba: 35, combo: 70 };
+    let servicoSelecionado = "corte";
+    let pagamentoSelecionado = "pix";
+    let pagamentoTextoMap = { pix: "PIX", dinheiro: "Dinheiro", cartao: "Cartão" };
+    let servicoNomeMap = { corte: "Corte", barba: "Barba", combo: "Combo" };
+    let valorMap = { corte: 40, barba: 35, combo: 70 };
+
+    function atualizarStatusFila() {
+        // Buscar dados atualizados
+        let filaAtual = JSON.parse(localStorage.getItem('filaClientes') || '[]');
+        let senhaAtual = parseInt(localStorage.getItem('senhaAtualAtendimento') || '0');
+        let tempo = parseInt(localStorage.getItem('tempoAtendimento') || '10');
+        
+        document.getElementById('senhaAtualDisplay').innerHTML = senhaAtual === 0 ? "---" : String(senhaAtual).padStart(3, '0');
+        
+        if(meuCliente) {
+            const pessoasNaFrente = filaAtual.filter(c => c.senha < meuCliente.senha && c.status === 'aguardando').length;
+            const tempoEspera = pessoasNaFrente * tempo;
+            const tempoTexto = tempoEspera >= 60 ? `${Math.floor(tempoEspera/60)}h ${tempoEspera%60}min` : `${tempoEspera}min`;
+            document.getElementById('pessoasNaFrente').innerHTML = `Pessoas na sua frente: ${pessoasNaFrente}`;
+            document.getElementById('tempoEsperaDisplay').innerHTML = `⏱️ Tempo estimado: ${tempoTexto}`;
+        } else {
+            const totalFila = filaAtual.filter(c => c.status === 'aguardando').length;
+            document.getElementById('pessoasNaFrente').innerHTML = `Pessoas na fila: ${totalFila}`;
+        }
+    }
+
+    function entrarNaFila() {
+        const nome = document.getElementById('nome').value.trim();
+        const whats = document.getElementById('whats').value.trim();
+        
+        if(!nome || !whats) {
+            alert("⚠️ Preencha nome e WhatsApp antes de entrar na fila!");
+            return;
+        }
+        
+        // Pegar último número de senha
+        let ultimo = parseInt(localStorage.getItem('ultimaSenha') || '0');
+        const novaSenha = ultimo + 1;
+        localStorage.setItem('ultimaSenha', novaSenha);
+        
+        let filaAtual = JSON.parse(localStorage.getItem('filaClientes') || '[]');
+        const posicao = filaAtual.filter(c => c.status === 'aguardando').length + 1;
+        const tempoEspera = (posicao - 1) * tempoMedio;
+        const tempoTexto = tempoEspera >= 60 ? `${Math.floor(tempoEspera/60)}h ${tempoEspera%60}min` : `${tempoEspera}min`;
+        
+        meuCliente = {
+            senha: novaSenha,
+            nome: nome,
+            whats: whats,
+            servico: servicoSelecionado,
+            servicoNome: servicoNomeMap[servicoSelecionado],
+            valor: valorMap[servicoSelecionado],
+            pagamento: pagamentoSelecionado,
+            pagamentoTexto: pagamentoTextoMap[pagamentoSelecionado],
+            status: 'aguardando',
+            entrada: new Date().toISOString()
+        };
+        
+        filaAtual.push(meuCliente);
+        localStorage.setItem('filaClientes', JSON.stringify(filaAtual));
+        
+        // Atualizar display
+        const senhaFormatada = String(novaSenha).padStart(3, '0');
+        document.getElementById('senhaDisplay').innerHTML = senhaFormatada;
+        document.getElementById('posicaoDisplay').innerHTML = `📌 Posição na fila: ${posicao}º`;
+        document.getElementById('timerDisplay').innerHTML = `⏱️ Tempo estimado: ${tempoTexto}`;
+        
+        document.getElementById('senhaModalDisplay').innerHTML = senhaFormatada;
+        document.getElementById('modalPosicaoDisplay').innerHTML = `📌 Posição na fila: ${posicao}º`;
+        document.getElementById('modalTimerDisplay').innerHTML = `⏱️ Tempo estimado: ${tempoTexto}`;
+        document.getElementById('modalSenhaAtualDisplay').innerHTML = `🔔 Atendendo agora: ${document.getElementById('senhaAtualDisplay').innerHTML}`;
+        document.getElementById('senhaModal').style.display = 'flex';
+        
+        atualizarStatusFila();
+        
+        // Enviar mensagem para o DONO
+        let msgDono = `🆕 *NOVO CLIENTE NA FILA!*\n\n👤 Nome: ${nome}\n📞 WhatsApp: ${whats}\n✂️ Serviço: ${servicoNomeMap[servicoSelecionado]}\n💰 Valor: R$ ${meuCliente.valor.toFixed(2)}\n💳 Pagamento: ${pagamentoTextoMap[pagamentoSelecionado]}\n🎫 SENHA: ${senhaFormatada}\n📌 POSIÇÃO: ${posicao}º\n⏱️ TEMPO ESTIMADO: ${tempoTexto}\n\n✅ Aguardando atendimento.`;
+        
+        let numeroDono = DONO_WHATSAPP.replace(/\D/g, '');
+        if (!numeroDono.startsWith('55')) numeroDono = '55' + numeroDono;
+        window.open(`https://wa.me/${numeroDono}?text=${encodeURIComponent(msgDono)}`, '_blank');
+        
+        alert(`✅ VOCÊ ENTROU NA FILA!\n\n🎫 SENHA: ${senhaFormatada}\n📌 POSIÇÃO: ${posicao}º\n⏱️ TEMPO ESTIMADO: ${tempoTexto}\n\n📱 Você receberá uma mensagem quando chegar sua vez!`);
+    }
+
+    function confirmarFila() {
+        if(!meuCliente) {
+            alert("⚠️ Entre na fila primeiro clicando em 'ENTRAR NA FILA'!");
+            return;
+        }
+        
+        const senhaFormatada = String(meuCliente.senha).padStart(3, '0');
+        let msgCliente = `✅ *VOCÊ ESTÁ NA FILA DE ATENDIMENTO!*\n\n🏆 *Barbearia Camisa 12 Sports*\n\n👤 Nome: ${meuCliente.nome}\n✂️ Serviço: ${meuCliente.servicoNome}\n💰 Valor: R$ ${meuCliente.valor.toFixed(2)}\n💳 Pagamento: ${meuCliente.pagamentoTexto}\n\n🎫 *SUA SENHA: ${senhaFormatada}*\n\n📌 *POSIÇÃO: ${document.getElementById('posicaoDisplay').innerHTML}*\n⏱️ *${document.getElementById('timerDisplay').innerHTML}*\n\n📍 Aguardamos você!\n\n👉 *IMPORTANTE:* Guarde sua senha. Você será avisado no WhatsApp quando chegar sua vez!\n\n🟣 *PAGAMENTO PIX*\nChave: ${CHAVE_PIX}\nValor: R$ ${meuCliente.valor.toFixed(2)}`;
+        
+        let numeroCliente = meuCliente.whats.replace(/\D/g, '');
+        if (!numeroCliente.startsWith('55')) numeroCliente = '55' + numeroCliente;
+        window.open(`https://wa.me/${numeroCliente}?text=${encodeURIComponent(msgCliente)}`, '_blank');
+        
+        alert(`✅ Confirmação enviada para ${meuCliente.nome}!\n\n📱 Mensagem enviada no WhatsApp.`);
+    }
+
+    function copiarChavePix() {
+        navigator.clipboard.writeText(CHAVE_PIX);
+        alert("✅ Chave PIX copiada: " + CHAVE_PIX);
+    }
+
+    function atualizarValor() {
+        let valor = valorMap[servicoSelecionado];
+        document.getElementById('pixValorDisplay').innerHTML = `💰 Valor: R$ ${valor.toFixed(2)}`;
+        document.getElementById('totalValor').innerHTML = `R$ ${valor.toFixed(2)}`;
+        document.getElementById('servicoPriceDisplay').innerHTML = `💰 Valor: R$ ${valor.toFixed(2)}`;
+    }
+
+    function gerarQRCodeApp() {
+        const container = document.getElementById('qrCodeAppContainer');
+        if(container) { container.innerHTML = ''; new QRCode(container, { text: LINK_APP, width: 80, height: 80 }); }
+        const modalContainer = document.getElementById('qrAppModalContainer');
+        if(modalContainer) { modalContainer.innerHTML = ''; new QRCode(modalContainer, { text: LINK_APP, width: 250, height: 250 }); }
+    }
+
+    function initPaymentOptions() {
+        document.querySelectorAll('.payment-card').forEach(card => { card.onclick = () => { pagamentoSelecionado = card.dataset.pagamento; document.querySelectorAll('.payment-card').forEach(c => c.classList.remove('selected')); card.classList.add('selected'); }; });
+        document.querySelector('.payment-card').classList.add('selected');
+    }
+
+    function abrirModalApp() { document.getElementById('qrAppModal').style.display = 'flex'; }
+    function fecharModalApp() { document.getElementById('qrAppModal').style.display = 'none'; }
+    function fecharSenhaModal() { document.getElementById('senhaModal').style.display = 'none'; }
+
+    // Eventos
+    document.getElementById('entrarFilaBtn').onclick = entrarNaFila;
+    document.getElementById('btnConfirmarFila').onclick = confirmarFila;
+    document.getElementById('closeSenhaModal').onclick = fecharSenhaModal;
+    document.getElementById('servicoSelect').onchange = (e) => { servicoSelecionado = e.target.value; atualizarValor(); };
+    document.getElementById('comboCard').onclick = () => { servicoSelecionado = 'combo'; document.getElementById('servicoSelect').value = 'combo'; atualizarValor(); };
+    document.getElementById('copyPixBtn').onclick = copiarChavePix;
+    document.getElementById('qrCodeAppBtn').onclick = abrirModalApp;
+    document.getElementById('closeQrAppModal').onclick = fecharModalApp;
+
+    // Atualizar a cada 3 segundos
+    setInterval(() => {
+        atualizarStatusFila();
+    }, 3000);
+
+    atualizarValor(); initPaymentOptions(); setTimeout(gerarQRCodeApp, 100);
+</script>
+</body>
+</html>
